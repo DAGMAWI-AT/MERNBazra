@@ -39,23 +39,33 @@ async function run() {
     // Send a ping to confirm a successful connection
 //create collaction of document 
 const  carscollaction= client.db("bazra").collection("cars")
-    //insert cars data to db :use post metod
+const  bannercollaction= client.db("bazra").collection("banner")
+
+ 
+
+
+    //get or show car data from database
+
+    app.get("/allbanner", async(req,res)=>{
+        const banner =bannercollaction.find();
+        const result=await banner.toArray();
+        res.send(result);
+    })
+    app.post("/addbanner", async(req,res)=>{
+      const data =req.body;
+      const result=await bannercollaction.insertOne(data);
+      res.send(result);
+  })
+
+
+
+
+   //insert cars data to db :use post metod
     app.post("/addcars", async(req,res)=>{
         const data =req.body;
         const result=await carscollaction.insertOne(data);
         res.send(result);
     })
-
-
-    //get or show car data from database
-
-    // app.get("/allcars", async(req,res)=>{
-    //     const cars =carscollaction.find();
-    //     const result=await cars.toArray();
-    //     res.send(result);
-    // })
-
-
     //update car data use patch mehode
 
     app.patch("/updatecars/:id", async(req,res)=>{
