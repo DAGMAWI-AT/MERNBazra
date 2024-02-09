@@ -54,11 +54,23 @@ const  carscollaction= client.db("bazra").collection("cars")
         const result=await banner.toArray();
         res.send(result);
     })
-    app.post("/addbanner", async(req,res)=>{
-      const data =req.body;
-      const result=await bannercollaction.insertOne(data);
-      res.send(result);
-  })
+  //   app.post("/addbanner", async(req,res)=>{
+  //     const data =req.body;
+  //     const result=await bannercollaction.insertOne(data);
+  //     res.send(result);
+  // })
+      app.post("/addbanner", upload.single('imageFile'), async (req, res) => {
+  try {
+    const data = req.body;
+    // Assuming 'bannercollaction' is a collection instance
+    const result = await bannercollaction.insertOne(data);
+
+    res.json({ success: true, message: 'Banner added successfully', result });
+  } catch (error) {
+    console.error('Error adding banner:', error);
+    res.status(500).json({ success: false, message: 'Internal Server Error' });
+  }
+});
 
     //insert cars data to db :use post metod
     app.post("/addcars", async(req,res)=>{
