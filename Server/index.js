@@ -8,7 +8,8 @@ app.use(express.json());
 
 // ... Your route and MongoDB configuration code
 
-
+const storage = multer.memoryStorage(); // Use memory storage for files
+const upload = multer({ storage });
 
 
 app.get('/', (req,res)=>{
