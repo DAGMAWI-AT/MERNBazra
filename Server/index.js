@@ -8,9 +8,16 @@ app.use(cors());
 app.use(express.json());
 
 // ... Your route and MongoDB configuration code
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, 'public/images'); // Specify the destination folder
+  },
+  filename: function (req, file, cb) {
+    cb(null, file.originalname);
+  },
+});
+const upload = multer({ storage: storage });
 
-const storage = multer.memoryStorage(); // Use memory storage for files
-const upload = multer({ storage });
 
 
 app.get('/', (req,res)=>{
@@ -66,26 +73,21 @@ const  bannercollaction= client.db("bazra").collection("banner")
   //     const result=await bannercollaction.insertOne(data);
   //     res.send(result);
   // })
-  app.post("/addbanner", upload.single('imageFile'), async (req, res) => {
-    try {
-      const data = req.body;
-      const imageFile = req.file;
-  
-      // Assuming 'bannercollaction' is a collection instance
-      const result = await bannercollaction.insertOne({
-        ...data,
-        imageFile: {
-          data: imageFile.buffer,
-          contentType: imageFile.mimetype
-        }
-      });
-  
-      res.json({ success: true, message: 'Banner added successfully', result });
-    } catch (error) {
-      console.error('Error adding banner:', error);
-      res.status(500).json({ success: false, message: 'Internal Server Error' });
-    }
-  });
+// Route for uploading banner with image
+app.post('/addbanner', upload.single('imageFile'), async (req, res) => {
+  try {
+    const data = req.body;
+    data.imageFile = req.file.filename; // Save the filename in MongoDB
+
+    // Assuming 'bannercollection' is your MongoDB collection
+    const result = await bannercollection.insertOne(data);
+
+    res.json({ success: true, message: 'Banner added successfully', result });
+  } catch (error) {
+    console.error('Error adding banner:', error);
+    res.status(500).json({ success: false, message: 'Internal Server Error' });
+  }
+});
   
 
     //insert cars data to db :use post metod
