@@ -41,14 +41,9 @@ async function run() {
     // Send a ping to confirm a successful connection
 //create collaction of document 
 const  carscollaction= client.db("bazra").collection("cars")
-<<<<<<< HEAD
+HEAD
 const  bannercollaction= client.db("bazra").collection("banner")
-=======
 
-
-
-      const  bannercollaction= client.db("bazra").collection("banner")
->>>>>>> 0c037bd79ea224da4ae59c7f31ce036f996ed888
 
  
 
@@ -60,18 +55,12 @@ const  bannercollaction= client.db("bazra").collection("banner")
         const result=await banner.toArray();
         res.send(result);
     })
-<<<<<<< HEAD
-    app.post("/addbanner", async(req,res)=>{
-      const data =req.body;
-      const result=await bannercollaction.insertOne(data);
-      res.send(result);
-  })
 
 
 
 
    //insert cars data to db :use post metod
-=======
+
   //   app.post("/addbanner", async(req,res)=>{
   //     const data =req.body;
   //     const result=await bannercollaction.insertOne(data);
@@ -91,7 +80,7 @@ const  bannercollaction= client.db("bazra").collection("banner")
 });
 
     //insert cars data to db :use post metod
->>>>>>> 0c037bd79ea224da4ae59c7f31ce036f996ed888
+
     app.post("/addcars", async(req,res)=>{
         const data =req.body;
         const result=await carscollaction.insertOne(data);
