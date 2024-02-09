@@ -2,13 +2,15 @@ const express = require('express');
 const app = express();
 const port = process.env.PORT || 8000;
 const cors = require('cors');
+const multer = require('multer');
 
 app.use(cors());
 app.use(express.json());
 
 // ... Your route and MongoDB configuration code
 
-
+const storage = multer.memoryStorage(); // Use memory storage for files
+const upload = multer({ storage });
 
 
 app.get('/', (req,res)=>{
@@ -39,7 +41,14 @@ async function run() {
     // Send a ping to confirm a successful connection
 //create collaction of document 
 const  carscollaction= client.db("bazra").collection("cars")
+<<<<<<< HEAD
 const  bannercollaction= client.db("bazra").collection("banner")
+=======
+
+
+
+      const  bannercollaction= client.db("bazra").collection("banner")
+>>>>>>> 0c037bd79ea224da4ae59c7f31ce036f996ed888
 
  
 
@@ -51,6 +60,7 @@ const  bannercollaction= client.db("bazra").collection("banner")
         const result=await banner.toArray();
         res.send(result);
     })
+<<<<<<< HEAD
     app.post("/addbanner", async(req,res)=>{
       const data =req.body;
       const result=await bannercollaction.insertOne(data);
@@ -61,6 +71,27 @@ const  bannercollaction= client.db("bazra").collection("banner")
 
 
    //insert cars data to db :use post metod
+=======
+  //   app.post("/addbanner", async(req,res)=>{
+  //     const data =req.body;
+  //     const result=await bannercollaction.insertOne(data);
+  //     res.send(result);
+  // })
+      app.post("/addbanner", upload.single('imageFile'), async (req, res) => {
+  try {
+    const data = req.body;
+    // Assuming 'bannercollaction' is a collection instance
+    const result = await bannercollaction.insertOne(data);
+
+    res.json({ success: true, message: 'Banner added successfully', result });
+  } catch (error) {
+    console.error('Error adding banner:', error);
+    res.status(500).json({ success: false, message: 'Internal Server Error' });
+  }
+});
+
+    //insert cars data to db :use post metod
+>>>>>>> 0c037bd79ea224da4ae59c7f31ce036f996ed888
     app.post("/addcars", async(req,res)=>{
         const data =req.body;
         const result=await carscollaction.insertOne(data);
