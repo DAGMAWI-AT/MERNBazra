@@ -5,8 +5,9 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "nodemon index.js",
-    "build":"npm i"
+    "prestart": "chmod +x node_modules/.bin/nodemon",
+     "start": "nodemon index.js",
+      "build": "npm i"
   },
   "author": "",
   "license": "ISC",
