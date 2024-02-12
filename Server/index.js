@@ -48,7 +48,7 @@ async function run() {
     // Connect the client to the server	(optional starting in v4.7)
     await client.connect();
     // Send a ping to confirm a successful connection
-    
+
     //create collaction of document
     const carscollaction = client.db("bazra").collection("cars");
 
@@ -87,6 +87,13 @@ async function run() {
           .json({ success: false, message: "Internal Server Error" });
       }
     });
+//delate banner
+app.delete("/deletebanner/:id", async (req, res) => {
+  const id = req.params.id;
+  const filter = { _id: new ObjectId(id) };
+  const result = await bannercollaction.deleteOne(filter);
+  res.send(result);
+});
 
     //insert cars data to db :use post metod
 
