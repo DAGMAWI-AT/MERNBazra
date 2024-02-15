@@ -3,13 +3,17 @@ const app = express();
 const port = process.env.PORT || 8000;
 const cors = require("cors");
 const multer = require("multer");
-const path = require("path"); // Import the 'path' module
+const path = require("path");
+const fileUpload = require('express-fileupload');
 
 app.use(cors());
 app.use(express.json());
 app.use("/images", express.static(path.join(__dirname, "public/images")));
 app.use("/videos", express.static(path.join(__dirname, "public/videos")));
 app.use("/overview", express.static(path.join(__dirname, "public/overview")));
+app.use('/serviceimages', express.static(path.join(__dirname, 'public/serviceimages')));
+// app.use('/serviceicons', express.static(path.join(__dirname, 'public/serviceicons')));
+app.use(fileUpload());
 
 // ... Your route and MongoDB configuration code
 const storage = multer.diskStorage({
@@ -52,10 +56,39 @@ const bzoverviewimage = multer.diskStorage({
   },
 });
 
+const imagestorage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, "public/serviceimages");
+  },
+  filename: (req, file, cb) => {
+    cb(
+      null,
+      file.fieldname + "_" + Date.now() + path.extname(file.originalname)
+    );
+  },
+});
+
+const fs = require('fs');
+
+const destinationDirectory = 'public/slide';
+
+// Create destination directory if it doesn't exist
+if (!fs.existsSync(destinationDirectory)) {
+  fs.mkdirSync(destinationDirectory, { recursive: true });
+}
+
+const cargallarystorage = multer.diskStorage({
+  destination: destinationDirectory,
+  filename: (req, file, cb) => {
+    cb(null, file.fieldname + '_' + Date.now() + path.extname(file.originalname));
+  },
+});
+
+const gallaryslideupload = multer({ storage: cargallarystorage });
 const upload = multer({ storage: storage });
 const uploadVideos = multer({ storage: storageVideos });
 const bzoverviewUpload = multer({ storage: bzoverviewimage });
-
+const uploadServiceImage = multer({ storage: imagestorage });
 
 app.get("/", (req, res) => {
   res.send("hello dagi");
@@ -88,6 +121,83 @@ async function run() {
     const bannercollaction = client.db("bazra").collection("banner");
     const whoweareCollection = client.db("bazra").collection("whoweare");
     const bzoverviewCollection = client.db("bazra").collection("bzoverview");
+    const serviceCollection = client.db("bazra").collection("service");
+    const cargallaryCollection = client.db("bazra").collection("gallary");
+
+
+    app.post('/cargallaryshow', gallaryslideupload.single('image'), async (req, res) => {
+      try {
+        // Check if req.file is undefined or falsy
+        if (!req.file) {
+          return res.status(400).json({
+            success: false,
+            message: 'No image file uploaded',
+          });
+        }
+    
+        const data = req.body;
+        data.image = req.file.filename;
+    
+        const result = await cargallaryCollection.insertOne(data);
+    
+        res.json({
+          success: true,
+          message: 'Car added successfully',
+          result,
+        });
+      } catch (error) {
+        console.error('Error adding car:', error);
+        res.status(500).json({
+          success: false,
+          message: 'Internal Server Error',
+        });
+      }
+    });
+    
+    
+
+
+//for service server side    
+    app.post("/uploadservice", uploadServiceImage.single("imageFiles"), async (req, res) => {
+      try {
+        const data = req.body;
+        data.imageFiles = req.file.filename; // Save the filename in MongoDB
+    
+        const result = await serviceCollection.insertOne(data);
+    
+        res.json({
+          success: true,
+          message: "Service data added successfully",
+          result,
+        });
+      } catch (error) {
+        console.error("Error adding service data:", error);
+        res.status(500).json({ success: false, message: "Internal Server Error" });
+      }
+    });
+
+    app.get("/services", async (req, res) => {
+      try {
+        const videos = await serviceCollection.find().toArray();
+        res.json(videos);
+      } catch (error) {
+        console.error("Error fetching videos:", error);
+        res
+          .status(500)
+          .json({ success: false, message: "Internal Server Error" });
+      }
+    });
+
+    app.get("/services/:id", async (req, res) => {
+      const id = req.params.id;
+      const filter = { _id: new ObjectId(id) };
+      const result = await serviceCollection.findOne(filter);
+      res.send(result);
+    });
+
+
+
+
 
 //over view server side
     app.get("/bzoverview", async (req, res) => {
